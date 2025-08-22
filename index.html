@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Berchen's MarketPlace - A fantasy RPG marketplace simulator in the greatest city of Ilberd">
+    <meta name="keywords" content="RPG, marketplace, fantasy, game, D&D, adventure">
+    <meta name="author" content="Your Name">
+    <meta property="og:title" content="Berchen's MarketPlace">
+    <meta property="og:description" content="Fantasy RPG marketplace simulator in the greatest city of Ilberd">
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="https://yourusername.github.io/berchens-marketplace">
+    <meta property="og:image" content="https://yourusername.github.io/berchens-marketplace/preview.png">
+    
+    <title>Berchen's MarketPlace - Greatest City of Ilberd</title>
+    
+    <!-- Favicon -->
+    <link rel="icon" type="image/x-icon" href="favicon.ico">
+    
+    <!-- CSS -->
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <div class="container">
+        <div class="currency-counter">
+            <div class="currency-item">💰 <span id="gold-amount">0</span> Gold</div>
+            <div class="currency-item">🥈 <span id="silver-amount">0</span> Silver</div>
+            <div class="currency-item">🥉 <span id="copper-amount">0</span> Copper</div>
+        </div>
+
+        <header>
+            <h1>Berchen's MarketPlace</h1>
+            <p class="subtitle">Greatest city of Ilberd</p>
+        </header>
+
+        <nav class="shop-navigation">
+            <button class="nav-btn active" data-shop="weapons">⚔️ Weapon Shop</button>
+            <button class="nav-btn" data-shop="armory">🛡️ Armory</button>
+            <button class="nav-btn" data-shop="magic">🔮 Magic Shop</button>
+            <button class="nav-btn" data-shop="apothecary">🧪 Apothecary</button>
+            <button class="nav-btn" data-shop="alchemy">⚗️ Alchemist</button>
+            <button class="nav-btn" data-shop="blacksmith">🔨 Blacksmith</button>
+            <button class="nav-btn" data-shop="general">📦 General Store</button>
+            <button class="nav-btn" data-shop="tailor">✂️ Tailor</button>
+            <button class="nav-btn" data-shop="music">🎵 Music Store</button>
+        </nav>
+
+        <div class="shop-header">
+            <h2 id="shop-title">⚔️ Weapon Shop</h2>
+            <p id="shop-description">Fine blades and ranged weapons for the discerning adventurer</p>
+        </div>
+
+        <div class="store-grid" id="store-grid">
+            <!-- Items will be populated by JavaScript -->
+        </div>
+    </div>
+
+    <!-- Currency Setup Modal -->
+    <div id="currency-setup-modal" class="modal" style="display: block;">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2 class="modal-title">💰 Welcome, Adventurer!</h2>
+            </div>
+          
+            <div class="modal-description">
+                Before you begin shopping, please tell us how much coin you're carrying:
+            </div>
+          <button class="buy-btn" id="start-shopping">Start Shopping</button>
+          
+            <div class="currency-input-section">
+                <div class="currency-input-group">
+                    <label for="input-gold">💰 Gold Pieces:</label>
+                    <input type="number" id="input-gold" min="0" value="0" class="currency-input">
+                </div>
+                <div class="currency-input-group">
+                    <label for="input-silver">🥈 Silver Pieces:</label>
+                    <input type="number" id="input-silver" min="0" value="0" class="currency-input">
+                </div>
+                <div class="currency-input-group">
+                    <label for="input-copper">🥉 Copper Pieces:</label>
+                    <input type="number" id="input-copper" min="0" value="0" class="currency-input">
+                </div>
+            </div>
+            <div class="currency-note">
+                <small>💡 Remember: 1 Gold = 10 Silver = 100 Copper</small>
+            </div>
+            
+        </div>
+    </div>
+
+    <!-- Modal -->
+    <div id="item-modal" class="modal">
+        <div class="modal-content">
+            <span class="close">&times;</span>
+            <div class="modal-header">
+                <h2 class="modal-title" id="modal-title"></h2>
+                <div class="modal-price" id="modal-price"></div>
+                <div class="item-rarity" id="modal-rarity"></div>
+            </div>
+            <div class="modal-description" id="modal-description"></div>
+            <div class="stats-section" id="modal-stats"></div>
+            <div class="payment-section" id="payment-section">
+                <div class="payment-title">💳 Payment & Change Calculator</div>
+                <div class="price-breakdown" id="price-breakdown"></div>
+                <div class="change-calculator" id="change-calculator" style="display: none;">
+                    <div class="change-title">💰 Your Change:</div>
+                    <div class="change-display" id="change-display"></div>
+                </div>
+            </div>
+            <button class="buy-btn" id="buy-button">Purchase Item</button>
+        </div>
+    </div>
+
+    <div id="notification" class="notification"></div>
+
+    <!-- JavaScript -->
+    <script src="scripts.js"></script>
+</body>
+</html>
