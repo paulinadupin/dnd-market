@@ -59,10 +59,10 @@ const storeItems = {
             stats: "Consumable, 1 use"
         },
         {
-            name: "Lumberjack’s Handaxe",
+            name: "Lumberjack's Handaxe",
             price: { gold: 5, silver: 0, copper: 0 },
             rarity: "common",
-            preview: "A sturdy axe favored by Berchen’s lumberjacks.",
+            preview: "A sturdy axe favored by Berchen's lumberjacks.",
             description: "Well-balanced hatchet, good for both chopping wood and foes.",
             stats: "Melee weapon (simple handaxe)<br>Damage: 1d6 slashing<br>Properties: Light, Thrown (20/60)<br>Weight: 2 lbs"
         },
@@ -84,15 +84,14 @@ const storeItems = {
         }
     ],
     armory: [
-       {
+        {
             name: "Spare Shield Strap",
             price: { gold: 0, silver: 0, copper: 8 },
             rarity: "common",
             preview: "A reinforced leather strap for shields.",
             description: "If you would drop your shield due to a mishap, fumble, or similar effect, the spare strap keeps the shield in place instead. The strap then breaks and is destroyed.",
             stats: "Adventuring Gear, Consumable, 1 use"
-        }
-        ,
+        },
         {
             name: "Padded Armor",
             price: { gold: 5, silver: 0, copper: 0 },
@@ -100,9 +99,8 @@ const storeItems = {
             preview: "Quilted layers of cloth and padding offering minimal protection.",
             description: "Light armor consisting of quilted layers of cloth. Provides minimal protection but is inexpensive and easy to wear. You have disadvantage on Dexterity (Stealth) checks while wearing it.",
             stats: "AC: 11 + Dex modifier<br>Weight: 8 lbs<br>Category: Light Armor<br>Stealth: Disadvantage"
-          }
-        ,
-       {
+        },
+        {
             name: "Shield",
             price: { gold: 10, silver: 0, copper: 0 },
             rarity: "common",
@@ -110,15 +108,14 @@ const storeItems = {
             description: "While wielding a shield, you gain a +2 bonus to AC. Equipping or unequipping a shield requires an action.",
             stats: "AC Bonus: +2<br>Weight: 6 lbs<br>Category: Shield"
         },
-         {
-          name: "Cloak of Protection",
-          price: { gold: 500, silver: 0, copper: 0 },
-          rarity: "uncommon",
-          preview: "A cloak shimmering faintly with protective runes.",
-          description: "While wearing this cloak, you gain a +1 bonus to AC and saving throws. Requires attunement.",
-          stats: "AC Bonus: +1<br>Saving Throws: +1<br>Attunement: Required"
-      }
-
+        {
+            name: "Cloak of Protection",
+            price: { gold: 500, silver: 0, copper: 0 },
+            rarity: "uncommon",
+            preview: "A cloak shimmering faintly with protective runes.",
+            description: "While wearing this cloak, you gain a +1 bonus to AC and saving throws. Requires attunement.",
+            stats: "AC Bonus: +1<br>Saving Throws: +1<br>Attunement: Required"
+        }
     ],
     magic: [
         {
@@ -128,8 +125,7 @@ const storeItems = {
             preview: "A simple wax candle.",
             description: "Burns for 1 hour, shedding bright light in a 5-foot radius and dim light for an additional 5 feet.",
             stats: "Consumable, 1 use, Weight: 0.1 lb"
-        }
-,
+        },
         {
             name: "Scroll of Light",
             price: { gold: 15, silver: 0, copper: 0 },
@@ -137,8 +133,7 @@ const storeItems = {
             preview: "A parchment scroll inscribed with the Light cantrip.",
             description: "This spell scroll contains the Light cantrip. You can cast the spell from the scroll without using a spell slot. Once used, the scroll is destroyed.",
             stats: "Spell: Light (Cantrip), Consumable, 1 use"
-        }
-  ,
+        },
         {
             name: "Driftglobe",
             price: { gold: 750, silver: 0, copper: 0 },
@@ -147,14 +142,14 @@ const storeItems = {
             description: "The driftglobe can follow its owner, providing light or casting *Daylight* once per day.",
             stats: "Light: 20 ft bright, 20 ft dim<br>Spell: Daylight 1/day"
         },
-      {
-    name: "Ring of Sending",
-    price: { gold: 1000, silver: 0, copper: 0 }, 
-    rarity: "rare",
-    preview: "A simple ring inscribed with magical runes.",
-    description: "While wearing this ring, you can use an action to send a short message of up to 25 words to a creature you know. The message is delivered instantly, regardless of distance, even across planes. You can use this property once per day. The ring requires attunement.",
-    stats: "Charges: 1/day<br>Activation: Action<br>Range: Unlimited<br>Requires Attunement: Yes"
-}
+        {
+            name: "Ring of Sending",
+            price: { gold: 1000, silver: 0, copper: 0 }, 
+            rarity: "rare",
+            preview: "A simple ring inscribed with magical runes.",
+            description: "While wearing this ring, you can use an action to send a short message of up to 25 words to a creature you know. The message is delivered instantly, regardless of distance, even across planes. You can use this property once per day. The ring requires attunement.",
+            stats: "Charges: 1/day<br>Activation: Action<br>Range: Unlimited<br>Requires Attunement: Yes"
+        }
     ],
     apothecary: [
         {
@@ -207,15 +202,14 @@ const storeItems = {
             description: "Can be used as lamp fuel or thrown for minor fire damage.",
             stats: "Consumable, 1 use"
         },
-{
-    name: "Smoke Bomb",
-    price: { gold: 1, silver: 0, copper: 0 },
-    rarity: "common",
-    preview: "A small clay sphere filled with powdered chemicals.",
-    description: "As an action, you can throw this bomb up to 20 feet. Upon impact, it creates a cloud of smoke in a 20-foot radius, heavily obscuring the area. The smoke lasts until the start of your next turn. The bomb is consumed after use.",
-    stats: "Consumable, 1 use, Action to throw, Area: 20 ft radius, Duration: 1 round"
-}
-,
+        {
+            name: "Smoke Bomb",
+            price: { gold: 1, silver: 0, copper: 0 },
+            rarity: "common",
+            preview: "A small clay sphere filled with powdered chemicals.",
+            description: "As an action, you can throw this bomb up to 20 feet. Upon impact, it creates a cloud of smoke in a 20-foot radius, heavily obscuring the area. The smoke lasts until the start of your next turn. The bomb is consumed after use.",
+            stats: "Consumable, 1 use, Action to throw, Area: 20 ft radius, Duration: 1 round"
+        },
         {
             name: "Oil of Slipperiness",
             price: { gold: 250, silver: 0, copper: 0 },
@@ -250,17 +244,14 @@ const storeItems = {
             description: "Bypasses resistances of supernatural creatures.",
             stats: "Damage: Normal arrows, but silvered"
         },
-{
-    name: "Full Plate Armor",
-    price: { gold: 1000, silver: 0, copper: 0 }, 
-    rarity: "common",
-    preview: "A heavy suit of steel armor covering the entire body.",
-    description: "This full plate armor provides excellent protection but is heavy and requires strength to wear effectively. It imposes disadvantage on Stealth checks due to its weight.",
-    stats: "Armor Type: Heavy Armor<br>AC: 18<br>Strength Requirement: 15<br>Stealth: Disadvantage<br>Weight: 65 lbs<br>Nonmagical"
-}
-
-
-,
+        {
+            name: "Full Plate Armor",
+            price: { gold: 1000, silver: 0, copper: 0 }, 
+            rarity: "common",
+            preview: "A heavy suit of steel armor covering the entire body.",
+            description: "This full plate armor provides excellent protection but is heavy and requires strength to wear effectively. It imposes disadvantage on Stealth checks due to its weight.",
+            stats: "Armor Type: Heavy Armor<br>AC: 18<br>Strength Requirement: 15<br>Stealth: Disadvantage<br>Weight: 65 lbs<br>Nonmagical"
+        }
     ],
     general: [
         {
@@ -279,15 +270,14 @@ const storeItems = {
             description: "Provides bright light for 20 ft, dim light for 20 ft for 6 hours.",
             stats: "Consumable oil (3 uses)"
         },
-      {
-    name: "Fishing Rod",
-    price: { gold: 1, silver: 0, copper: 0 },
-    rarity: "common",
-    preview: "A simple rod for catching fish in rivers or lakes.",
-    description: "This basic fishing rod allows you to catch fish for food or trade. Using it does not require a skill check, but time and patience are needed.",
-    stats: "Weight: 4 lbs<br>Category: Adventuring Gear<br>Nonmagical"
-}
-,
+        {
+            name: "Fishing Rod",
+            price: { gold: 1, silver: 0, copper: 0 },
+            rarity: "common",
+            preview: "A simple rod for catching fish in rivers or lakes.",
+            description: "This basic fishing rod allows you to catch fish for food or trade. Using it does not require a skill check, but time and patience are needed.",
+            stats: "Weight: 4 lbs<br>Category: Adventuring Gear<br>Nonmagical"
+        },
         {
             name: "Fishing Net",
             price: { gold: 5, silver: 0, copper: 0 },
@@ -296,24 +286,22 @@ const storeItems = {
             description: "Can be used to restrain targets or catch fish.",
             stats: "Special attack to restrain"
         },
-     {
-    name: "Tent (2-person)",
-    price: { gold: 5, silver: 0, copper: 0 },
-    rarity: "common",
-    preview: "A basic canvas tent for two people.",
-    description: "A simple canvas tent that accommodates two people. Provides basic shelter from weather.",
-    stats: "Capacity: 2 people<br>Weight: 20 lbs<br>Nonmagical"
-}
-,
-    {
-    name: "Rope, Silk (50 ft)",
-    price: { gold: 100, silver: 0, copper: 0 },
-    rarity: "common",
-    preview: "A strong, smooth rope made of braided silk.",
-    description: "This 50-foot length of silk rope is lighter and stronger than hemp rope. It can support up to 500 pounds of weight.",
-    stats: "Weight: 5 lbs<br>Strength: Holds 500 lbs<br>Material: Silk, Nonmagical"
-}
-  
+        {
+            name: "Tent (2-person)",
+            price: { gold: 5, silver: 0, copper: 0 },
+            rarity: "common",
+            preview: "A basic canvas tent for two people.",
+            description: "A simple canvas tent that accommodates two people. Provides basic shelter from weather.",
+            stats: "Capacity: 2 people<br>Weight: 20 lbs<br>Nonmagical"
+        },
+        {
+            name: "Rope, Silk (50 ft)",
+            price: { gold: 100, silver: 0, copper: 0 },
+            rarity: "common",
+            preview: "A strong, smooth rope made of braided silk.",
+            description: "This 50-foot length of silk rope is lighter and stronger than hemp rope. It can support up to 500 pounds of weight.",
+            stats: "Weight: 5 lbs<br>Strength: Holds 500 lbs<br>Material: Silk, Nonmagical"
+        }
     ],
     tailor: [
         {
@@ -325,22 +313,21 @@ const storeItems = {
             stats: "Utility, cosmetic"
         },
         {
-            name: "Traveler’s Cloak",
+            name: "Traveler's Cloak",
             price: { gold: 12, silver: 0, copper: 0 },
             rarity: "common",
             preview: "A weatherproof cloak.",
             description: "Protects from rain and keeps its wearer warm.",
             stats: "Durable, light"
         },
-      {
+        {
             name: "Traveler's Boots (High-Quality)",
             price: { gold: 20, silver: 0, copper: 0 },
             rarity: "common",
             preview: "Sturdy leather boots reinforced for long journeys.",
             description: "These boots are crafted from soft, durable leather and reinforced at the soles and ankles. They are comfortable for long-distance travel, protecting the feet from rough terrain and reducing fatigue.",
             stats: "Weight: 2 lbs<br>Nonmagical, Durable, Comfortable for long travel"
-        }
-,
+        },
         {
             name: "Hat of Disguise",
             price: { gold: 700, silver: 0, copper: 0 },
@@ -360,7 +347,7 @@ const storeItems = {
             stats: "Utility, 1 use per round"
         },
         {
-            name: "Traveler’s Flute",
+            name: "Traveler's Flute",
             price: { gold: 5, silver: 0, copper: 0 },
             rarity: "common",
             preview: "A simple flute of ash wood.",
@@ -375,18 +362,16 @@ const storeItems = {
             description: "Grants advantage on History checks about sailor history of a Ezhulian sea.",
             stats: "Utility item"
         },
-{
-    name: "Fochlucan Bandore",
-    price: { gold: 500, silver: 0, copper: 0 }, 
-    rarity: "uncommon",
-    preview: "A finely crafted lute adorned with minor magical runes.",
-    description: "While holding this bandore, you can use it as a spellcasting focus. It allows you to cast certain spells (like *Charm Person* and *Cure Wounds*) from the instrument’s table. Requires attunement by a bard.",
-    stats: "Magical: Yes<br>Attunement: Bard only<br>Spells: Cast from DMG table for instrument<br>Charges: Recharge daily"
-}
-
+        {
+            name: "Fochlucan Bandore",
+            price: { gold: 500, silver: 0, copper: 0 }, 
+            rarity: "uncommon",
+            preview: "A finely crafted lute adorned with minor magical runes.",
+            description: "While holding this bandore, you can use it as a spellcasting focus. It allows you to cast certain spells (like *Charm Person* and *Cure Wounds*) from the instrument's table. Requires attunement by a bard.",
+            stats: "Magical: Yes<br>Attunement: Bard only<br>Spells: Cast from DMG table for instrument<br>Charges: Recharge daily"
+        }
     ]
 };
-
 
 // Currency conversion functions
 function convertToCopper(currency) {
