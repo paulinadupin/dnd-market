@@ -62,7 +62,7 @@ const storeItems = {
             name: "Lumberjack's Handaxe",
             price: { gold: 5, silver: 0, copper: 0 },
             rarity: "common",
-            preview: "A sturdy axe favored by Berchen's lumberjacks.",
+            preview: "A sturdy axe favored by Birchen's lumberjacks.",
             description: "Well-balanced hatchet, good for both chopping wood and foes.",
             stats: "Melee weapon (simple handaxe)<br>Damage: 1d6 slashing<br>Properties: Light, Thrown (20/60)<br>Weight: 2 lbs"
         },
