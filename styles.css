@@ -1,4 +1,4 @@
-<style>
+
 * {
     margin: 0;
     padding: 0;
@@ -834,70 +834,139 @@ h1::after {
         transform: translateY(-5px) !important;
     }
 }
-</style>
+.action-buttons {
+    display: flex;
+    justify-content: center;
+    gap: 20px;
+    margin-bottom: 30px;
+    padding: 20px;
+}
 
-<!-- Add floating particles for magical effect -->
-<div class="floating-particles" id="floating-particles"></div>
+.action-btn {
+    background: linear-gradient(145deg, #8a7850, #6b5c43);
+    color: #1a1208;
+    border: 2px solid #b8a070;
+    padding: 12px 24px;
+    border-radius: 6px;
+    cursor: pointer;
+    font-family: inherit;
+    font-size: 1em;
+    font-weight: bold;
+    transition: all 0.3s ease;
+    text-shadow: 1px 1px 2px rgba(255, 255, 255, 0.3);
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
+}
 
-<script>
-// Add floating particles
-document.addEventListener('DOMContentLoaded', function() {
-    const particlesContainer = document.getElementById('floating-particles');
-    const particleCount = 30;
-    
-    for (let i = 0; i < particleCount; i++) {
-        const particle = document.createElement('div');
-        particle.classList.add('particle');
-        
-        // Random size between 2-6px
-        const size = Math.random() * 4 + 2;
-        particle.style.width = `${size}px`;
-        particle.style.height = `${size}px`;
-        
-        // Random position
-        particle.style.left = `${Math.random() * 100}vw`;
-        
-        // Random animation duration between 10-20s
-        const duration = Math.random() * 10 + 10;
-        particle.style.animationDuration = `${duration}s`;
-        
-        // Random delay
-        particle.style.animationDelay = `${Math.random() * 5}s`;
-        
-        particlesContainer.appendChild(particle);
+.action-btn:hover {
+    background: linear-gradient(145deg, #9d8a60, #8a7850);
+    transform: translateY(-2px);
+    box-shadow: 0 6px 12px rgba(107, 92, 67, 0.4);
+}
+
+.sell-input-group {
+    margin-bottom: 15px;
+}
+
+.sell-input {
+    width: 100%;
+    padding: 10px;
+    border: 2px solid #6b5c43;
+    border-radius: 6px;
+    background: rgba(35, 27, 18, 0.8);
+    color: #e0d5c0;
+    font-size: 1em;
+    font-family: inherit;
+    box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.3);
+    transition: all 0.3s ease;
+}
+
+.sell-input:focus {
+    outline: none;
+    border-color: #b8a070;
+    box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.3), 0 0 8px rgba(184, 160, 112, 0.3);
+}
+
+.summary-section {
+    margin: 20px 0;
+    padding: 15px;
+    background: rgba(35, 27, 18, 0.6);
+    border-radius: 8px;
+    border: 1px solid #6b5c43;
+}
+
+.summary-title {
+    color: #d6c6a5;
+    font-weight: bold;
+    font-size: 1.2em;
+    margin-bottom: 15px;
+    text-align: center;
+}
+
+.summary-list {
+    margin-bottom: 15px;
+}
+
+.summary-item {
+    display: flex;
+    justify-content: space-between;
+    padding: 5px 0;
+    border-bottom: 1px solid rgba(107, 92, 67, 0.3);
+    color: #e0d5c0;
+}
+
+.summary-total {
+    font-weight: bold;
+    font-size: 1.1em;
+    text-align: center;
+    color: #d6c6a5;
+    border-top: 2px solid #6b5c43;
+    padding-top: 10px;
+    margin-top: 15px;
+}
+
+@media (max-width: 768px) {
+    .action-buttons {
+        flex-direction: column;
+        gap: 10px;
     }
     
-    // Add subtle cursor trail effect
-    let trailElements = [];
-    const trailCount = 5;
-    
-    for (let i = 0; i < trailCount; i++) {
-        const trail = document.createElement('div');
-        trail.style.position = 'fixed';
-        trail.style.width = '6px';
-        trail.style.height = '6px';
-        trail.style.background = 'rgba(184, 160, 112, 0.3)';
-        trail.style.borderRadius = '50%';
-        trail.style.pointerEvents = 'none';
-        trail.style.zIndex = '9999';
-        trail.style.opacity = '0';
-        trail.style.transition = 'opacity 0.3s, transform 0.3s';
-        document.body.appendChild(trail);
-        trailElements.push(trail);
+    .action-btn {
+        width: 100%;
     }
-    
-    document.addEventListener('mousemove', function(e) {
-        trailElements.forEach((trail, index) => {
-            setTimeout(() => {
-                trail.style.opacity = '0.5';
-                trail.style.transform = `translate(${e.clientX - 3}px, ${e.clientY - 3}px) scale(1)`;
-                
-                setTimeout(() => {
-                    trail.style.opacity = '0';
-                    trail.style.transform = `translate(${e.clientX - 3}px, ${e.clientY - 3}px) scale(0.5)`;
-                }, 300);
-            }, index * 100);
-        });
-    });
-});
-</script>
+}
+
+.clickable-item {
+    cursor: pointer;
+    transition: all 0.3s ease;
+    border-radius: 4px;
+    padding: 8px 5px !important;
+}
+
+.clickable-item:hover {
+    background: rgba(184, 160, 112, 0.2);
+    transform: translateX(5px);
+}
+
+.click-hint {
+    color: #b8a070;
+    font-size: 0.9em;
+    opacity: 0;
+    transition: opacity 0.3s ease;
+}
+
+.clickable-item:hover .click-hint {
+    opacity: 1;
+}
+
+.purchased-badge {
+    display: inline-block;
+    background: linear-gradient(145deg, #5a7d5a, #4a6b4a);
+    color: #e0d5c0;
+    padding: 4px 12px;
+    border-radius: 15px;
+    font-size: 0.9em;
+    font-weight: bold;
+    margin-top: 10px;
+    text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.8);
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+}

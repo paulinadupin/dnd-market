@@ -6,6 +6,9 @@ let playerCurrency = {
 };
 let currentItem = null;
 let currentShop = 'weapons';
+let purchasedItems = [];
+let soldItems = [];
+let startingCurrency = { gold: 0, silver: 0, copper: 0 };
 
 // Shop data with descriptions
 const shopData = {
@@ -551,11 +554,18 @@ function closeModal() {
 }
 
 // Purchase function
+// Purchase function (REPLACE the existing one)
 function purchaseItem() {
     if (!currentItem || !canAfford(currentItem.price)) {
         showNotification('Insufficient funds!', 'error');
         return;
     }
+
+    // Add to purchased items list
+    purchasedItems.push({
+        name: currentItem.name,
+        price: { ...currentItem.price }
+    });
 
     // Calculate new currency after purchase
     const playerTotal = convertToCopper(playerCurrency);
@@ -582,6 +592,7 @@ function setupPlayerCurrency() {
     const copper = parseInt(document.getElementById('input-copper').value) || 0;
     
     playerCurrency = { gold, silver, copper };
+    startingCurrency = { gold, silver, copper }; // Track starting amount
     updateCurrencyDisplay();
     
     document.getElementById('currency-setup-modal').style.display = 'none';
@@ -620,6 +631,9 @@ document.addEventListener('DOMContentLoaded', function() {
     
     // Setup currency modal scroll indicators
     setupCurrencyModal();
+
+     document.getElementById('sell-btn').onclick = openSellModal;
+    document.getElementById('finish-shopping-btn').onclick = showShoppingSummary;
     
     // Navigation event listeners
     document.querySelectorAll('.nav-btn').forEach(btn => {
@@ -658,3 +672,269 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     });
 });
+
+// Sell item functions
+function openSellModal() {
+    const modal = document.createElement('div');
+    modal.id = 'sell-modal';
+    modal.className = 'modal';
+    modal.style.display = 'block';
+    
+    modal.innerHTML = `
+        <div class="modal-content">
+            <span class="close" onclick="closeSellModal()">&times;</span>
+            <div class="modal-header">
+                <h2 class="modal-title">💰 Sell Item</h2>
+            </div>
+            <div class="modal-description">
+                What would you like to sell?
+            </div>
+            <div class="sell-input-group">
+                <label for="sell-item-name">Item Name:</label>
+                <input type="text" id="sell-item-name" class="sell-input" placeholder="Enter item name">
+            </div>
+            <div class="currency-input-section">
+                <div class="currency-input-group">
+                    <label for="sell-gold">💰 Gold Received:</label>
+                    <input type="number" id="sell-gold" min="0" value="0" class="currency-input">
+                </div>
+                <div class="currency-input-group">
+                    <label for="sell-silver">🥈 Silver Received:</label>
+                    <input type="number" id="sell-silver" min="0" value="0" class="currency-input">
+                </div>
+                <div class="currency-input-group">
+                    <label for="sell-copper">🥉 Copper Received:</label>
+                    <input type="number" id="sell-copper" min="0" value="0" class="currency-input">
+                </div>
+            </div>
+            <button class="buy-btn" onclick="sellItem()">Sell Item</button>
+        </div>
+    `;
+    
+    document.body.appendChild(modal);
+}
+
+function closeSellModal() {
+    const modal = document.getElementById('sell-modal');
+    if (modal) {
+        modal.remove();
+    }
+}
+
+function sellItem() {
+    const itemName = document.getElementById('sell-item-name').value.trim();
+    const gold = parseInt(document.getElementById('sell-gold').value) || 0;
+    const silver = parseInt(document.getElementById('sell-silver').value) || 0;
+    const copper = parseInt(document.getElementById('sell-copper').value) || 0;
+    
+    if (!itemName) {
+        showNotification('Please enter an item name!', 'error');
+        return;
+    }
+    
+    if (gold === 0 && silver === 0 && copper === 0) {
+        showNotification('Please enter a sale amount!', 'error');
+        return;
+    }
+    
+    // Add to sold items list
+    const salePrice = { gold, silver, copper };
+    soldItems.push({
+        name: itemName,
+        price: salePrice
+    });
+    
+    // Add currency to player
+    playerCurrency.gold += gold;
+    playerCurrency.silver += silver;
+    playerCurrency.copper += copper;
+    
+    updateCurrencyDisplay();
+    showNotification(`Successfully sold ${itemName}!`, 'success');
+    closeSellModal();
+}
+
+// Shopping summary functions
+function showShoppingSummary() {
+    const modal = document.createElement('div');
+    modal.id = 'summary-modal';
+    modal.className = 'modal';
+    modal.style.display = 'block';
+    
+    // Calculate totals
+    let totalSpent = { gold: 0, silver: 0, copper: 0 };
+    let totalEarned = { gold: 0, silver: 0, copper: 0 };
+    
+    purchasedItems.forEach(item => {
+        totalSpent.gold += item.price.gold;
+        totalSpent.silver += item.price.silver;
+        totalSpent.copper += item.price.copper;
+    });
+    
+    soldItems.forEach(item => {
+        totalEarned.gold += item.price.gold;
+        totalEarned.silver += item.price.silver;
+        totalEarned.copper += item.price.copper;
+    });
+    
+    // Create purchased items list
+    let purchasedList = '';
+    if (purchasedItems.length > 0) {
+        purchasedItems.forEach((item, index) => {
+            purchasedList += `
+                <div class="summary-item clickable-item" onclick="showPurchasedItemDetail(${index})">
+                    <span>${item.name}</span>
+                    <span>${formatPrice(item.price)}</span>
+                    <span class="click-hint">👁️</span>
+                </div>
+            `;
+        });
+    } else {
+        purchasedList = '<div class="summary-item"><span>No items purchased</span><span>-</span></div>';
+    }
+    
+    // Create sold items list
+    let soldList = '';
+    if (soldItems.length > 0) {
+        soldItems.forEach(item => {
+            soldList += `
+                <div class="summary-item">
+                    <span>${item.name}</span>
+                    <span>${formatPrice(item.price)}</span>
+                </div>
+            `;
+        });
+    } else {
+        soldList = '<div class="summary-item"><span>No items sold</span><span>-</span></div>';
+    }
+    
+    // Calculate net change
+    const startingTotal = convertToCopper(startingCurrency);
+    const currentTotal = convertToCopper(playerCurrency);
+    const netChange = currentTotal - startingTotal;
+    const netCurrency = convertFromCopper(Math.abs(netChange));
+    const netString = netChange >= 0 ? 
+        `+${formatPrice(netCurrency)}` : 
+        `-${formatPrice(netCurrency)}`;
+    
+    modal.innerHTML = `
+        <div class="modal-content">
+            <span class="close" onclick="closeSummaryModal()">&times;</span>
+            <div class="modal-header">
+                <h2 class="modal-title">📋 Shopping Summary</h2>
+            </div>
+            
+            <div class="summary-section">
+                <div class="summary-title">🛍️ Items Purchased</div>
+                <div class="summary-list">
+                    ${purchasedList}
+                </div>
+                <div class="summary-total">Total Spent: ${formatPrice(totalSpent)}</div>
+            </div>
+            
+            <div class="summary-section">
+                <div class="summary-title">💰 Items Sold</div>
+                <div class="summary-list">
+                    ${soldList}
+                </div>
+                <div class="summary-total">Total Earned: ${formatPrice(totalEarned)}</div>
+            </div>
+            
+            <div class="summary-section">
+                <div class="summary-title">💼 Final Summary</div>
+                <div class="summary-item">
+                    <span>Starting Currency:</span>
+                    <span>${formatPrice(startingCurrency)}</span>
+                </div>
+                
+                <div class="summary-item">
+                <span>Current Currency:</span>
+                    <span><strong>${formatPrice(playerCurrency)}</strong></span>
+                    </div>
+            </div>
+            
+            <button class="buy-btn" onclick="resetShopping()">New Shopping Session</button>
+        </div>
+    `;
+    
+    document.body.appendChild(modal);
+}
+
+function closeSummaryModal() {
+    const modal = document.getElementById('summary-modal');
+    if (modal) {
+        modal.remove();
+    }
+}
+
+function resetShopping() {
+    purchasedItems = [];
+    soldItems = [];
+    startingCurrency = { ...playerCurrency };
+    closeSummaryModal();
+    showNotification('New shopping session started!', 'success');
+}
+
+// Show detailed view of purchased item
+function showPurchasedItemDetail(itemIndex) {
+    const purchasedItem = purchasedItems[itemIndex];
+    if (!purchasedItem) return;
+    
+    // Find the original item data from store
+    let originalItem = null;
+    for (let shopType in storeItems) {
+        const found = storeItems[shopType].find(item => item.name === purchasedItem.name);
+        if (found) {
+            originalItem = found;
+            break;
+        }
+    }
+    
+    // If we can't find the original item, create a basic one
+    if (!originalItem) {
+        originalItem = {
+            name: purchasedItem.name,
+            price: purchasedItem.price,
+            rarity: "unknown",
+            preview: "Previously purchased item",
+            description: "This item was purchased earlier in your shopping session.",
+            stats: "No additional details available"
+        };
+    }
+    
+    // Create detail modal
+    const detailModal = document.createElement('div');
+    detailModal.id = 'item-detail-modal';
+    detailModal.className = 'modal';
+    detailModal.style.display = 'block';
+    detailModal.style.zIndex = '2100'; // Higher than summary modal
+    
+    detailModal.innerHTML = `
+        <div class="modal-content">
+            <span class="close" onclick="closeItemDetailModal()">&times;</span>
+            <div class="modal-header">
+                <h2 class="modal-title">${originalItem.name}</h2>
+                <div class="modal-price">💰 ${formatPrice(originalItem.price)}</div>
+                <div class="item-rarity ${originalItem.rarity}">${originalItem.rarity.toUpperCase()}</div>
+                <div class="purchased-badge">✅ PURCHASED</div>
+            </div>
+            <div class="modal-description">${originalItem.description}</div>
+            <div class="stats-section">
+                <div class="stats-title">📊 Item Statistics</div>
+                ${originalItem.stats}
+            </div>
+            <button class="buy-btn" onclick="closeItemDetailModal()" style="background: linear-gradient(145deg, #6b5c43, #8a7850);">
+                Close Details
+            </button>
+        </div>
+    `;
+    
+    document.body.appendChild(detailModal);
+}
+
+function closeItemDetailModal() {
+    const modal = document.getElementById('item-detail-modal');
+    if (modal) {
+        modal.remove();
+    }
+}
