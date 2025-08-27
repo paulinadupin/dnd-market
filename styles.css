@@ -704,6 +704,7 @@ h1::after {
     padding: 1.5rem;
     border-radius: 5px;
     z-index: 10000000;
+    margin: 1rem;
    
 }
 
