@@ -14,7 +14,7 @@ let startingCurrency = { gold: 0, silver: 0, copper: 0 };
 const SHEET_ID =  '1rc83KqATlSmWUnC07TSAu0ePTFBHb3L2AneTrelSeFA'; 
 const ITEMS_SHEET_URL = `https://docs.google.com/spreadsheets/d/${SHEET_ID}/gviz/tq?sheet=Items&tqx=out:json`;
 const STORES_SHEET_URL = `https://docs.google.com/spreadsheets/d/${SHEET_ID}/gviz/tq?sheet=Stores&tqx=out:json`;
-const SITE_CONFIG_SHEET_URL = `https://docs.google.com/spreadsheets/d/${SHEET_ID}/gviz/tq?sheet=General&tqx=out:json`;
+const SITE_CONFIG_SHEET_URL = `https://docs.google.com/spreadsheets/d/${SHEET_ID}/gviz/tq?sheet=Name&tqx=out:json`;
 
 
 let shopData = {}; // Will be populated from Google Sheets
