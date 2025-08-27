@@ -592,6 +592,39 @@ function showShoppingSummary() {
             </div>
             
             <div class="summary-section">
+                <div class="summary-title">Currency Summary</div>
+                <div class="currency-summary">
+                    <div class="currency-line">
+                        <span class="currency-label">Starting Gold</span>
+                        <span class="currency-amount">${startingCurrency.gold} GP</span>
+                    </div>
+                    <div class="currency-line">
+                        <span class="currency-label">Starting Silver</span>
+                        <span class="currency-amount">${startingCurrency.silver} SP</span>
+                    </div>
+                    <div class="currency-line">
+                        <span class="currency-label">Starting Copper</span>
+                        <span class="currency-amount">${startingCurrency.copper} CP</span>
+                    </div>
+                </div>
+                
+                <div class="final-currency">
+                    <div class="currency-line">
+                        <span class="currency-label">Current Gold</span>
+                        <span class="currency-amount">${playerCurrency.gold} GP</span>
+                    </div>
+                    <div class="currency-line">
+                        <span class="currency-label">Current Silver</span>
+                        <span class="currency-amount">${playerCurrency.silver} SP</span>
+                    </div>
+                    <div class="currency-line">
+                        <span class="currency-label">Current Copper</span>
+                        <span class="currency-amount">${playerCurrency.copper} CP</span>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="summary-section">
                 <div class="summary-title">Final Summary</div>
                 <div class="summary-item">
                     <span>Starting Currency:</span>
