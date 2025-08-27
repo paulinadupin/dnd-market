@@ -15,30 +15,34 @@
     <!-- Favicon -->
     <link rel="icon" type="image/x-icon" href="favicon.ico">
     
+    <!-- Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Cinzel+Decorative:wght@700&family=Garamond:ital,wght@0,400;0,700;1,400&display=swap" rel="stylesheet">
+
     <!-- CSS -->
     <link rel="stylesheet" href="styles.css">
 </head>
 <body>
     
     <div class="container">
-           
-
-        <div class="shop-header">
-            <header>
+         <header>
             <h1>Loading...</h1>
              <p class="subtitle">Please wait...</p>
         </header>
-            
-            <h2 id="shop-title"></h2>
-            <p id="shop-description"></p>
+          
+
+        <div class="shop-header">
             <nav class="shop-navigation">   
             </nav>
+            <h2 id="shop-title"></h2>
+            <p id="shop-description"></p>
         </div>
 
         <div class="info-btn">
             <div class="action-buttons">
-                    <button class="action-btn" id="sell-btn">💰 Sell Item</button>
-                    <button class="action-btn" id="finish-shopping-btn">📋 Finish Shopping</button>
+                    <button class="action-btn" id="sell-btn">Sell Item</button>
+                    <button class="action-btn" id="finish-shopping-btn">Finish Shopping</button>
                 </div>
 
             <div class="currency-counter">
@@ -66,7 +70,7 @@
     <div id="currency-setup-modal" class="modal" style="display: block;">
         <div class="modal-content">
             <div class="modal-header">
-                <h2 class="modal-title">💰 Welcome, Adventurer!</h2>
+                <h2 class="modal-title"> Welcome, Adventurer!</h2>
             </div>
           
             <div class="modal-description">
@@ -76,15 +80,15 @@
           
             <div class="currency-input-section">
                 <div class="currency-input-group">
-                    <label for="input-gold">💰 Gold Pieces:</label>
+                    <label for="input-gold">Gold Pieces:</label>
                     <input type="number" id="input-gold" min="0" value="0" class="currency-input">
                 </div>
                 <div class="currency-input-group">
-                    <label for="input-silver">🥈 Silver Pieces:</label>
+                    <label for="input-silver">Silver Pieces:</label>
                     <input type="number" id="input-silver" min="0" value="0" class="currency-input">
                 </div>
                 <div class="currency-input-group">
-                    <label for="input-copper">🥉 Copper Pieces:</label>
+                    <label for="input-copper">Copper Pieces:</label>
                     <input type="number" id="input-copper" min="0" value="0" class="currency-input">
                 </div>
             </div>
@@ -109,7 +113,7 @@
             <div class="payment-section" id="payment-section">
                 <div class="price-breakdown" id="price-breakdown"></div>
                 <div class="change-calculator" id="change-calculator" style="display: none;">
-                    <div class="change-title">💰 Your Change:</div>
+                    <div class="change-title">Your Change:</div>
                     <div class="change-display" id="change-display"></div>
                 </div>
             </div>

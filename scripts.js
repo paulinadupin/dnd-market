@@ -624,16 +624,6 @@ function showShoppingSummary() {
                 </div>
             </div>
             
-            <div class="summary-section">
-                <div class="summary-title">Final Summary</div>
-                <div class="summary-item">
-                    <span>Starting Currency:</span>
-                    <span>${formatPrice(startingCurrency)}</span>
-                </div>
-               
-                <div class="summary-total">Current Currency: ${formatPrice(playerCurrency)}</div>
-            </div>
-            
             <button class="buy-btn" onclick="resetShopping()">New Shopping Session</button>
         </div>
     `;
