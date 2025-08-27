@@ -102,7 +102,7 @@ function parseSheetData(jsonData) {
     const rows = jsonData.table.rows;
     
     rows.forEach(row => {
-        if (!row.c || !row.c[0] || !row.c[1]) return;
+        if (!row.c || !row.c[1]) return;
         
         const shop = row.c[1]?.v;
         const name = row.c[2]?.v;
