@@ -10,371 +10,226 @@ let purchasedItems = [];
 let soldItems = [];
 let startingCurrency = { gold: 0, silver: 0, copper: 0 };
 
-// Shop data with descriptions
-const shopData = {
-    weapons: {
-        title: "⚔️ Weapon Shop",
-        description: "Fine blades and ranged weapons for the discerning adventurer"
-    },
-    armory: {
-        title: "🛡️ Armory",
-        description: "Protective gear and shields to keep you safe in battle"
-    },
-    magic: {
-        title: "🔮 Magic Shop",
-        description: "Mystical artifacts and enchanted items of great power"
-    },
-    apothecary: {
-        title: "🧪 Apothecary",
-        description: "Healing potions and remedies for what ails you"
-    },
-    alchemy: {
-        title: "⚗️ Alchemist",
-        description: "Experimental concoctions and magical components"
-    },
-    blacksmith: {
-        title: "🔨 Blacksmith",
-        description: "Custom metalwork and equipment maintenance"
-    },
-    general: {
-        title: "📦 General Store",
-        description: "Essential supplies and adventuring gear"
-    },
-    tailor: {
-        title: "✂️ Tailor",
-        description: "Fine clothing and fabric goods for any occasion"
-    },
-    music: {
-        title: "🎵 Music Store",
-        description: "Instruments and musical accessories for bards and music lovers"
-    }
+// Google Sheets configuration
+const SHEET_ID =  '1rc83KqATlSmWUnC07TSAu0ePTFBHb3L2AneTrelSeFA'; 
+const ITEMS_SHEET_URL = `https://docs.google.com/spreadsheets/d/${SHEET_ID}/gviz/tq?sheet=Items&tqx=out:json`;
+const STORES_SHEET_URL = `https://docs.google.com/spreadsheets/d/${SHEET_ID}/gviz/tq?sheet=Stores&tqx=out:json`;
+const SITE_CONFIG_SHEET_URL = `https://docs.google.com/spreadsheets/d/${SHEET_ID}/gviz/tq?sheet=General&tqx=out:json`;
+
+
+let shopData = {}; // Will be populated from Google Sheets
+let storeItems = {}; // Will be populated from Google Sheets
+let siteConfig = {
+    site_title: "D&D Market",
+    site_subtitle: "Website for D&D player to shop in game !"
 };
 
-// Store items organized by shop type
-const storeItems = {
-    weapons: [
-        {
-            name: "Sharpening Stone",
-            price: { gold: 0, silver: 5, copper: 0 },
-            rarity: "common",
-            preview: "A simple stone used to hone an edge.",
-            description: "Using this before a battle grants +1 damage for the first fight as the weapon edge is finely sharpened.",
-            stats: "Consumable, 1 use"
-        },
-        {
-            name: "Lumberjack's Handaxe",
-            price: { gold: 5, silver: 0, copper: 0 },
-            rarity: "common",
-            preview: "A sturdy axe favored by Birchen's lumberjacks.",
-            description: "Well-balanced hatchet, good for both chopping wood and foes.",
-            stats: "Melee weapon (simple handaxe)<br>Damage: 1d6 slashing<br>Properties: Light, Thrown (20/60)<br>Weight: 2 lbs"
-        },
-        {
-            name: "Silvered Dagger",
-            price: { gold: 25, silver: 0, copper: 0 },
-            rarity: "uncommon",
-            preview: "A dagger with a silvered edge.",
-            description: "Favored by monster hunters, this dagger bypasses resistances of certain supernatural creatures.",
-            stats: "Simple Melee weapon<br>Damage: 1d4 piercing<br>Properties: Finesse, Light, Thrown (20/60)<br>Weight: 1 lb"
-        },
-        {
-            name: "Moon-Touched Shortsword",
-            price: { gold: 150, silver: 0, copper: 0 },
-            rarity: "uncommon",
-            preview: "A faintly glowing shortsword.",
-            description: "When drawn, this sword sheds dim light in a 15 ft radius. Its glow never fades.",
-            stats: "Damage: 1d6 piercing<br>Properties: Light<br>Weight: 2 lbs"
+// Parse site configuration from Google Sheets
+function parseSiteConfig(jsonData) {
+    const config = {};
+    const rows = jsonData.table.rows;
+    
+    rows.forEach(row => {
+        if (!row.c || !row.c[0] || !row.c[1]) return;
+        
+        const setting = row.c[0]?.v;
+        const value = row.c[1]?.v;
+        
+        if (setting && value) {
+            config[setting] = value;
         }
-    ],
-    armory: [
-        {
-            name: "Spare Shield Strap",
-            price: { gold: 0, silver: 0, copper: 8 },
-            rarity: "common",
-            preview: "A reinforced leather strap for shields.",
-            description: "If you would drop your shield due to a mishap, fumble, or similar effect, the spare strap keeps the shield in place instead. The strap then breaks and is destroyed.",
-            stats: "Adventuring Gear, Consumable, 1 use"
-        },
-        {
-            name: "Padded Armor",
-            price: { gold: 5, silver: 0, copper: 0 },
-            rarity: "common",
-            preview: "Quilted layers of cloth and padding offering minimal protection.",
-            description: "Light armor consisting of quilted layers of cloth. Provides minimal protection but is inexpensive and easy to wear. You have disadvantage on Dexterity (Stealth) checks while wearing it.",
-            stats: "AC: 11 + Dex modifier<br>Weight: 8 lbs<br>Category: Light Armor<br>Stealth: Disadvantage"
-        },
-        {
-            name: "Shield",
-            price: { gold: 10, silver: 0, copper: 0 },
-            rarity: "common",
-            preview: "A sturdy shield, sometimes made of wood reinforced with metal.",
-            description: "While wielding a shield, you gain a +2 bonus to AC. Equipping or unequipping a shield requires an action.",
-            stats: "AC Bonus: +2<br>Weight: 6 lbs<br>Category: Shield"
-        },
-        {
-            name: "Cloak of Protection",
-            price: { gold: 500, silver: 0, copper: 0 },
-            rarity: "uncommon",
-            preview: "A cloak shimmering faintly with protective runes.",
-            description: "While wearing this cloak, you gain a +1 bonus to AC and saving throws. Requires attunement.",
-            stats: "AC Bonus: +1<br>Saving Throws: +1<br>Attunement: Required"
+    });
+    
+    return config;
+}
+
+// Load site configuration from Google Sheets
+async function loadSiteConfig() {
+    try {
+        const response = await fetch(SITE_CONFIG_SHEET_URL);
+        const text = await response.text();
+        const jsonData = JSON.parse(text.substr(47).slice(0, -2));
+        const loadedConfig = parseSiteConfig(jsonData);
+        
+        // Update siteConfig with loaded values
+        if (loadedConfig.site_title) siteConfig.site_title = loadedConfig.site_title;
+        if (loadedConfig.site_subtitle) siteConfig.site_subtitle = loadedConfig.site_subtitle;
+        
+        console.log('Site config loaded from Google Sheets');
+        updateSiteHeader();
+    } catch (error) {
+        console.error('Failed to load site config:', error);
+        updateSiteHeader(); // Use defaults
+    }
+}
+
+// Update the site header with loaded config
+function updateSiteHeader() {
+    document.querySelector('header h1').textContent = siteConfig.site_title;
+    document.querySelector('header .subtitle').textContent = siteConfig.site_subtitle;
+}
+
+// Parse store configuration with enabled filter
+function parseStoreData(jsonData) {
+    const stores = {};
+    const rows = jsonData.table.rows;
+    
+    rows.forEach(row => {
+        if (!row.c || !row.c[0] || !row.c[1]) return;
+        
+        const shop = row.c[0]?.v;
+        const title = row.c[1]?.v;
+        const description = row.c[2]?.v || '';
+        const enabled = row.c[3]?.v;
+        
+        if (!shop || !title) return;
+        
+        // Only include enabled stores
+        if (enabled === true || enabled === 'TRUE' || enabled === 'true') {
+            stores[shop] = {
+                title: title,
+                description: description
+            };
         }
-    ],
-    magic: [
-        {
-            name: "Candle",
-            price: { gold: 0, silver: 0, copper: 1 },
-            rarity: "common",
-            preview: "A simple wax candle.",
-            description: "Burns for 1 hour, shedding bright light in a 5-foot radius and dim light for an additional 5 feet.",
-            stats: "Consumable, 1 use, Weight: 0.1 lb"
-        },
-        {
-            name: "Scroll of Light",
-            price: { gold: 15, silver: 0, copper: 0 },
-            rarity: "common",
-            preview: "A parchment scroll inscribed with the Light cantrip.",
-            description: "This spell scroll contains the Light cantrip. You can cast the spell from the scroll without using a spell slot. Once used, the scroll is destroyed.",
-            stats: "Spell: Light (Cantrip), Consumable, 1 use"
-        },
-        {
-            name: "Driftglobe",
-            price: { gold: 750, silver: 0, copper: 0 },
-            rarity: "uncommon",
-            preview: "A small glass orb that floats and glows.",
-            description: "The driftglobe can follow its owner, providing light or casting *Daylight* once per day.",
-            stats: "Light: 20 ft bright, 20 ft dim<br>Spell: Daylight 1/day"
-        },
-        {
-            name: "Ring of Sending",
-            price: { gold: 1000, silver: 0, copper: 0 }, 
-            rarity: "rare",
-            preview: "A simple ring inscribed with magical runes.",
-            description: "While wearing this ring, you can use an action to send a short message of up to 25 words to a creature you know. The message is delivered instantly, regardless of distance, even across planes. You can use this property once per day. The ring requires attunement.",
-            stats: "Charges: 1/day<br>Activation: Action<br>Range: Unlimited<br>Requires Attunement: Yes"
+    });
+    
+    return stores;
+}
+
+// Parse items with enabled filter
+function parseSheetData(jsonData) {
+    const items = {};
+    const rows = jsonData.table.rows;
+    
+    rows.forEach(row => {
+        if (!row.c || !row.c[0] || !row.c[1]) return;
+        
+        const shop = row.c[0]?.v;
+        const name = row.c[1]?.v;
+        const gold = row.c[2]?.v || 0;
+        const silver = row.c[3]?.v || 0;
+        const copper = row.c[4]?.v || 0;
+        const rarity = row.c[5]?.v || 'common';
+        const preview = row.c[6]?.v || '';
+        const description = row.c[7]?.v || '';
+        const stats = row.c[8]?.v || '';
+        const enabled = row.c[9]?.v;
+        
+        if (!shop || !name) return;
+        
+        // Only include enabled items
+        if (enabled === true || enabled === 'TRUE' || enabled === 'true') {
+            if (!items[shop]) {
+                items[shop] = [];
+            }
+            
+            items[shop].push({
+                name,
+                price: { gold, silver, copper },
+                rarity,
+                preview,
+                description,
+                stats
+            });
         }
-    ],
-    apothecary: [
-        {
-            name: "Bundle of Healing Herbs",
-            price: { gold: 0, silver: 5, copper: 0 },
-            rarity: "common",
-            preview: "A small pouch of dried herbs.",
-            description: "Restores 1 HP when chewed during a short rest.",
-            stats: "Consumable, 1 use"
+    });
+    
+    return items;
+}
+
+// Load store configuration from Google Sheets
+async function loadStoreConfig() {
+    try {
+        const response = await fetch(STORES_SHEET_URL);
+        const text = await response.text();
+        const jsonData = JSON.parse(text.substr(47).slice(0, -2));
+        shopData = parseStoreData(jsonData);
+        console.log('Store config loaded from Google Sheets');
+    } catch (error) {
+        console.error('Failed to load store config:', error);
+        loadBackupStores();
+    }
+}
+
+// Load items from Google Sheets
+async function loadStoreItems() {
+    try {
+        const response = await fetch(ITEMS_SHEET_URL);
+        const text = await response.text();
+        const jsonData = JSON.parse(text.substr(47).slice(0, -2));
+        storeItems = parseSheetData(jsonData);
+        console.log('Items loaded from Google Sheets');
+    } catch (error) {
+        console.error('Failed to load from Google Sheets:', error);
+        loadBackupItems();
+    }
+}
+
+// Backup store configuration
+function loadBackupStores() {
+    shopData = {
+        weapons: {
+            title: "Weapon Shop",
+            description: "Fine blades and ranged weapons for the discerning adventurer"
         },
-        {
-            name: "Sleep Tea",
-            price: { gold: 0, silver: 8, copper: 0 },
-            rarity: "common",
-            preview: "A fragrant herbal tea.",
-            description: "Promotes restful sleep and relieves nightmares.",
-            stats: "Consumable, 1 use"
+        armory: {
+            title: "Armory",
+            description: "Protective gear and shields to keep you safe in battle"
         },
-        {
-            name: "Potion of Minor Healing",
-            price: { gold: 20, silver: 0, copper: 0 },
-            rarity: "common",
-            preview: "A vial of diluted healing potion.",
-            description: "Restores 1d4+2 hit points when consumed.",
-            stats: "Effect: Heal 1d4+2 HP<br>Duration: Instant"
-        },
-        {
-            name: "Potion of Greater Healing",
-            price: { gold: 100, silver: 0, copper: 0 },
-            rarity: "uncommon",
-            preview: "A potent healing draught with golden swirls.",
-            description: "Restores 4d4+4 hit points.",
-            stats: "Effect: Heal 4d4+4 HP<br>Duration: Instant"
+        magic: {
+            title: "Magic Shop",
+            description: "Mystical artifacts and enchanted items of great power"
         }
-    ],
-    alchemy: [
-        {
-            name: "Stink Bomb",
-            price: { gold: 0, silver: 0, copper: 9 },
-            rarity: "common",
-            preview: "A fragile glass vial of foul liquid.",
-            description: "Creates a 10 ft cloud of unbearable odor, causing nausea (roleplay effect).",
-            stats: "Consumable, 1 use"
-        },
-        {
-            name: "Oil Flask",
-            price: { gold: 0, silver: 1, copper: 0 },
-            rarity: "common",
-            preview: "A clay flask filled with oil.",
-            description: "Can be used as lamp fuel or thrown for minor fire damage.",
-            stats: "Consumable, 1 use"
-        },
-        {
-            name: "Smoke Bomb",
-            price: { gold: 1, silver: 0, copper: 0 },
-            rarity: "common",
-            preview: "A small clay sphere filled with powdered chemicals.",
-            description: "As an action, you can throw this bomb up to 20 feet. Upon impact, it creates a cloud of smoke in a 20-foot radius, heavily obscuring the area. The smoke lasts until the start of your next turn. The bomb is consumed after use.",
-            stats: "Consumable, 1 use, Action to throw, Area: 20 ft radius, Duration: 1 round"
-        },
-        {
-            name: "Oil of Slipperiness",
-            price: { gold: 250, silver: 0, copper: 0 },
-            rarity: "uncommon",
-            preview: "A slick black vial of enchanted oil.",
-            description: "Replicates the *Grease* spell, can coat armor or ground.",
-            stats: "Duration: 8 hours"
+    };
+}
+
+// Backup items (fallback data)
+function loadBackupItems() {
+    storeItems = {
+        weapons: [
+            {
+                name: "Longsword +1",
+                price: { gold: 15, silver: 0, copper: 0 },
+                rarity: "uncommon",
+                preview: "A finely crafted blade that gleams with magical enhancement.",
+                description: "This masterwork longsword has been enchanted by skilled artificers.",
+                stats: "Damage: 1d8 + 1 slashing<br>Properties: Versatile (1d10), Magical"
+            }
+        ],
+        armory: [
+            {
+                name: "Shield",
+                price: { gold: 10, silver: 0, copper: 0 },
+                rarity: "common",
+                preview: "A sturdy shield for protection.",
+                description: "A basic shield providing defense in battle.",
+                stats: "AC Bonus: +2<br>Weight: 6 lbs"
+            }
+        ]
+    };
+}
+
+// Generate navigation buttons from store config
+function generateNavigation() {
+    const nav = document.querySelector('.shop-navigation');
+    nav.innerHTML = '';
+    
+    let isFirst = true;
+    for (const [shopKey, shopInfo] of Object.entries(shopData)) {
+        const button = document.createElement('button');
+        button.className = isFirst ? 'nav-btn active' : 'nav-btn';
+        button.setAttribute('data-shop', shopKey);
+        button.textContent = shopInfo.title;
+        button.onclick = () => switchShop(shopKey);
+        
+        nav.appendChild(button);
+        
+        if (isFirst) {
+            currentShop = shopKey;
+            isFirst = false;
         }
-    ],
-    blacksmith: [
-        {
-            name: "Iron Nails (10 count)",
-            price: { gold: 0, silver: 0, copper: 5 },
-            rarity: "common",
-            preview: "A bundle of sturdy iron nails.",
-            description: "Useful for traps, barricades, or repairs.",
-            stats: "Utility item"
-        },
-        {
-            name: "Reinforced Rope (50 ft)",
-            price: { gold: 1, silver: 0, copper: 0 },
-            rarity: "common",
-            preview: "A tough hemp rope with metal wire woven in.",
-            description: "Harder to cut or break than normal rope.",
-            stats: "DC 18 to break"
-        },
-        {
-            name: "Silvered Arrowheads (5)",
-            price: { gold: 25, silver: 0, copper: 0 },
-            rarity: "uncommon",
-            preview: "A small bundle of silver-tipped arrows.",
-            description: "Bypasses resistances of supernatural creatures.",
-            stats: "Damage: Normal arrows, but silvered"
-        },
-        {
-            name: "Full Plate Armor",
-            price: { gold: 1000, silver: 0, copper: 0 }, 
-            rarity: "common",
-            preview: "A heavy suit of steel armor covering the entire body.",
-            description: "This full plate armor provides excellent protection but is heavy and requires strength to wear effectively. It imposes disadvantage on Stealth checks due to its weight.",
-            stats: "Armor Type: Heavy Armor<br>AC: 18<br>Strength Requirement: 15<br>Stealth: Disadvantage<br>Weight: 65 lbs<br>Nonmagical"
-        }
-    ],
-    general: [
-        {
-            name: "Chalk Stick (3 uses)",
-            price: { gold: 0, silver: 0, copper: 2 },
-            rarity: "common",
-            preview: "A small stick of chalk.",
-            description: "Useful for marking walls, leaving signals, or maps.",
-            stats: "Consumable, 3 uses"
-        },
-        {
-            name: "Lantern with Oil (3 uses)",
-            price: { gold: 0, silver: 8, copper: 0 },
-            rarity: "common",
-            preview: "A small metal lantern with oil.",
-            description: "Provides bright light for 20 ft, dim light for 20 ft for 6 hours.",
-            stats: "Consumable oil (3 uses)"
-        },
-        {
-            name: "Fishing Rod",
-            price: { gold: 1, silver: 0, copper: 0 },
-            rarity: "common",
-            preview: "A simple rod for catching fish in rivers or lakes.",
-            description: "This basic fishing rod allows you to catch fish for food or trade. Using it does not require a skill check, but time and patience are needed.",
-            stats: "Weight: 4 lbs<br>Category: Adventuring Gear<br>Nonmagical"
-        },
-        {
-            name: "Fishing Net",
-            price: { gold: 5, silver: 0, copper: 0 },
-            rarity: "common",
-            preview: "A rope net used by local fishermen.",
-            description: "Can be used to restrain targets or catch fish.",
-            stats: "Special attack to restrain"
-        },
-        {
-            name: "Tent (2-person)",
-            price: { gold: 5, silver: 0, copper: 0 },
-            rarity: "common",
-            preview: "A basic canvas tent for two people.",
-            description: "A simple canvas tent that accommodates two people. Provides basic shelter from weather.",
-            stats: "Capacity: 2 people<br>Weight: 20 lbs<br>Nonmagical"
-        },
-        {
-            name: "Rope, Silk (50 ft)",
-            price: { gold: 100, silver: 0, copper: 0 },
-            rarity: "common",
-            preview: "A strong, smooth rope made of braided silk.",
-            description: "This 50-foot length of silk rope is lighter and stronger than hemp rope. It can support up to 500 pounds of weight.",
-            stats: "Weight: 5 lbs<br>Strength: Holds 500 lbs<br>Material: Silk, Nonmagical"
-        }
-    ],
-    tailor: [
-        {
-            name: "Color-Changing Ribbon",
-            price: { gold: 0, silver: 5, copper: 0 },
-            rarity: "common",
-            preview: "A decorative ribbon that shifts between colors.",
-            description: "Can switch between two colors at will.",
-            stats: "Utility, cosmetic"
-        },
-        {
-            name: "Traveler's Cloak",
-            price: { gold: 12, silver: 0, copper: 0 },
-            rarity: "common",
-            preview: "A weatherproof cloak.",
-            description: "Protects from rain and keeps its wearer warm.",
-            stats: "Durable, light"
-        },
-        {
-            name: "Traveler's Boots (High-Quality)",
-            price: { gold: 20, silver: 0, copper: 0 },
-            rarity: "common",
-            preview: "Sturdy leather boots reinforced for long journeys.",
-            description: "These boots are crafted from soft, durable leather and reinforced at the soles and ankles. They are comfortable for long-distance travel, protecting the feet from rough terrain and reducing fatigue.",
-            stats: "Weight: 2 lbs<br>Nonmagical, Durable, Comfortable for long travel"
-        },
-        {
-            name: "Hat of Disguise",
-            price: { gold: 700, silver: 0, copper: 0 },
-            rarity: "uncommon",
-            preview: "A stylish hat with enchantments.",
-            description: "Allows wearer to change appearance as per *Disguise Self*.",
-            stats: "Requires attunement"
-        }
-    ],
-    music: [
-        {
-            name: "Carved Whistle",
-            price: { gold: 0, silver: 0, copper: 3 },
-            rarity: "common",
-            preview: "A small whistle carved from bone.",
-            description: "Mimics the sound of a local birdcall.",
-            stats: "Utility, 1 use per round"
-        },
-        {
-            name: "Traveler's Flute",
-            price: { gold: 5, silver: 0, copper: 0 },
-            rarity: "common",
-            preview: "A simple flute of ash wood.",
-            description: "Favored by wandering minstrels.",
-            stats: "Instrument"
-        },
-        {
-            name: "Songbook of Ezhulian Ballads",
-            price: { gold: 1, silver: 5, copper: 0 },
-            rarity: "common",
-            preview: "A book of Ezhulian sailor songs and tales.",
-            description: "Grants advantage on History checks about sailor history of a Ezhulian sea.",
-            stats: "Utility item"
-        },
-        {
-            name: "Fochlucan Bandore",
-            price: { gold: 500, silver: 0, copper: 0 }, 
-            rarity: "uncommon",
-            preview: "A finely crafted lute adorned with minor magical runes.",
-            description: "While holding this bandore, you can use it as a spellcasting focus. It allows you to cast certain spells (like *Charm Person* and *Cure Wounds*) from the instrument's table. Requires attunement by a bard.",
-            stats: "Magical: Yes<br>Attunement: Bard only<br>Spells: Cast from DMG table for instrument<br>Charges: Recharge daily"
-        }
-    ]
-};
+    }
+}
 
 // Currency conversion functions
 function convertToCopper(currency) {
@@ -407,7 +262,7 @@ function calculateChange(price) {
     const priceTotal = convertToCopper(price);
     
     if (playerTotal < priceTotal) {
-        return null; // Cannot afford
+        return null;
     }
     
     const changeInCopper = playerTotal - priceTotal;
@@ -433,7 +288,12 @@ function switchShop(shopType) {
 }
 
 // Initialize store
-function initializeStore() {
+async function initializeStore() {
+    // Ensure items are loaded
+    if (Object.keys(storeItems).length === 0) {
+        await loadStoreItems();
+    }
+    
     const storeGrid = document.getElementById('store-grid');
     storeGrid.innerHTML = '';
 
@@ -455,7 +315,7 @@ function createItemCard(item, index) {
 
     card.innerHTML = `
         <div class="item-name">${item.name}</div>
-        <div class="item-price">💰 ${formatPrice(item.price)}</div>
+        <div class="item-price">${formatPrice(item.price)}</div>
         <div class="item-rarity ${item.rarity}">${item.rarity.toUpperCase()}</div>
         <div class="item-preview">${item.preview}</div>
     `;
@@ -479,27 +339,23 @@ function openModal(item) {
     currentItem = item;
     
     document.getElementById('modal-title').textContent = item.name;
-    document.getElementById('modal-price').innerHTML = `💰 ${formatPrice(item.price)}`;
+    document.getElementById('modal-price').innerHTML = `${formatPrice(item.price)}`;
     document.getElementById('modal-rarity').textContent = item.rarity.toUpperCase();
     document.getElementById('modal-rarity').className = `item-rarity ${item.rarity}`;
     document.getElementById('modal-description').textContent = item.description;
     document.getElementById('modal-stats').innerHTML = `
-        <div class="stats-title">📊 Item Statistics</div>
+        <div class="stats-title">Item Statistics</div>
         ${item.stats}
     `;
 
-    // Update payment section
     updatePaymentSection(item);
 
     const modal = document.getElementById('item-modal');
     modal.style.display = 'block';
     
-    // Setup scroll indicators
     const modalContent = modal.querySelector('.modal-content');
     setTimeout(() => {
         updateScrollIndicators(modalContent);
-        
-        // Add scroll listener
         modalContent.addEventListener('scroll', () => updateScrollIndicators(modalContent));
     }, 100);
 }
@@ -509,7 +365,6 @@ function updatePaymentSection(item) {
     const changeCalculator = document.getElementById('change-calculator');
     const buyButton = document.getElementById('buy-button');
     
-    // Show price breakdown
     let breakdown = '<div class="price-line"><span>Item Price:</span><span>' + formatPrice(item.price) + '</span></div>';
     breakdown += '<div class="price-line"><span>Your Currency:</span><span>' + formatPrice(playerCurrency) + '</span></div>';
     breakdown += '<div class="price-line total"><span>Total Cost:</span><span>' + formatPrice(item.price) + '</span></div>';
@@ -519,9 +374,9 @@ function updatePaymentSection(item) {
         if (change.gold > 0 || change.silver > 0 || change.copper > 0) {
             changeCalculator.style.display = 'block';
             document.getElementById('change-display').innerHTML = `
-                <div class="change-line">💰 Gold: ${change.gold}</div>
-                <div class="change-line">🥈 Silver: ${change.silver}</div>
-                <div class="change-line">🥉 Copper: ${change.copper}</div>
+                <div class="change-line">Gold: ${change.gold}</div>
+                <div class="change-line">Silver: ${change.silver}</div>
+                <div class="change-line">Copper: ${change.copper}</div>
             `;
         } else {
             changeCalculator.style.display = 'block';
@@ -554,20 +409,17 @@ function closeModal() {
 }
 
 // Purchase function
-// Purchase function (REPLACE the existing one)
 function purchaseItem() {
     if (!currentItem || !canAfford(currentItem.price)) {
         showNotification('Insufficient funds!', 'error');
         return;
     }
 
-    // Add to purchased items list
     purchasedItems.push({
         name: currentItem.name,
         price: { ...currentItem.price }
     });
 
-    // Calculate new currency after purchase
     const playerTotal = convertToCopper(playerCurrency);
     const priceTotal = convertToCopper(currentItem.price);
     const newTotal = playerTotal - priceTotal;
@@ -577,101 +429,6 @@ function purchaseItem() {
     showNotification(`Successfully purchased ${currentItem.name}!`, 'success');
     closeModal();
 }
-
-// Update currency display
-function updateCurrencyDisplay() {
-    document.getElementById('gold-amount').textContent = playerCurrency.gold;
-    document.getElementById('silver-amount').textContent = playerCurrency.silver;
-    document.getElementById('copper-amount').textContent = playerCurrency.copper;
-}
-
-// Currency setup functions
-function setupPlayerCurrency() {
-    const gold = parseInt(document.getElementById('input-gold').value) || 0;
-    const silver = parseInt(document.getElementById('input-silver').value) || 0;
-    const copper = parseInt(document.getElementById('input-copper').value) || 0;
-    
-    playerCurrency = { gold, silver, copper };
-    startingCurrency = { gold, silver, copper }; // Track starting amount
-    updateCurrencyDisplay();
-    
-    document.getElementById('currency-setup-modal').style.display = 'none';
-    initializeStore();
-}
-
-// Setup currency modal scroll indicators
-function setupCurrencyModal() {
-    const modal = document.getElementById('currency-setup-modal');
-    const modalContent = modal.querySelector('.modal-content');
-    
-    setTimeout(() => {
-        updateScrollIndicators(modalContent);
-        
-        // Add scroll listener
-        modalContent.addEventListener('scroll', () => updateScrollIndicators(modalContent));
-    }, 100);
-}
-
-// Show notification
-function showNotification(message, type) {
-    const notification = document.getElementById('notification');
-    notification.textContent = message;
-    notification.className = `notification ${type}`;
-    notification.classList.add('show');
-
-    setTimeout(() => {
-        notification.classList.remove('show');
-    }, 3000);
-}
-
-// Event listeners
-document.addEventListener('DOMContentLoaded', function() {
-    // Setup currency first
-    document.getElementById('start-shopping').onclick = setupPlayerCurrency;
-    
-    // Setup currency modal scroll indicators
-    setupCurrencyModal();
-
-     document.getElementById('sell-btn').onclick = openSellModal;
-    document.getElementById('finish-shopping-btn').onclick = showShoppingSummary;
-    
-    // Navigation event listeners
-    document.querySelectorAll('.nav-btn').forEach(btn => {
-        btn.addEventListener('click', function() {
-            const shopType = this.getAttribute('data-shop');
-            switchShop(shopType);
-        });
-    });
-    
-    // Other event listeners
-    document.querySelector('.close').onclick = closeModal;
-    document.getElementById('buy-button').onclick = purchaseItem;
-
-    window.onclick = function(event) {
-        const modal = document.getElementById('item-modal');
-        const setupModal = document.getElementById('currency-setup-modal');
-        if (event.target === modal) {
-            closeModal();
-        }
-        // Don't allow closing setup modal by clicking outside
-    };
-
-    // Keyboard navigation
-    document.addEventListener('keydown', function(event) {
-        if (event.key === 'Escape') {
-            closeModal();
-        }
-    });
-    
-    // Allow Enter key in currency setup
-    document.querySelectorAll('.currency-input').forEach(input => {
-        input.addEventListener('keydown', function(event) {
-            if (event.key === 'Enter') {
-                setupPlayerCurrency();
-            }
-        });
-    });
-});
 
 // Sell item functions
 function openSellModal() {
@@ -684,7 +441,7 @@ function openSellModal() {
         <div class="modal-content">
             <span class="close" onclick="closeSellModal()">&times;</span>
             <div class="modal-header">
-                <h2 class="modal-title">💰 Sell Item</h2>
+                <h2 class="modal-title">Sell Item</h2>
             </div>
             <div class="modal-description">
                 What would you like to sell?
@@ -695,15 +452,15 @@ function openSellModal() {
             </div>
             <div class="currency-input-section">
                 <div class="currency-input-group">
-                    <label for="sell-gold">💰 Gold Received:</label>
+                    <label for="sell-gold">Gold Received:</label>
                     <input type="number" id="sell-gold" min="0" value="0" class="currency-input">
                 </div>
                 <div class="currency-input-group">
-                    <label for="sell-silver">🥈 Silver Received:</label>
+                    <label for="sell-silver">Silver Received:</label>
                     <input type="number" id="sell-silver" min="0" value="0" class="currency-input">
                 </div>
                 <div class="currency-input-group">
-                    <label for="sell-copper">🥉 Copper Received:</label>
+                    <label for="sell-copper">Copper Received:</label>
                     <input type="number" id="sell-copper" min="0" value="0" class="currency-input">
                 </div>
             </div>
@@ -737,14 +494,12 @@ function sellItem() {
         return;
     }
     
-    // Add to sold items list
     const salePrice = { gold, silver, copper };
     soldItems.push({
         name: itemName,
         price: salePrice
     });
     
-    // Add currency to player
     playerCurrency.gold += gold;
     playerCurrency.silver += silver;
     playerCurrency.copper += copper;
@@ -761,7 +516,6 @@ function showShoppingSummary() {
     modal.className = 'modal';
     modal.style.display = 'block';
     
-    // Calculate totals
     let totalSpent = { gold: 0, silver: 0, copper: 0 };
     let totalEarned = { gold: 0, silver: 0, copper: 0 };
     
@@ -777,7 +531,6 @@ function showShoppingSummary() {
         totalEarned.copper += item.price.copper;
     });
     
-    // Create purchased items list
     let purchasedList = '';
     if (purchasedItems.length > 0) {
         purchasedItems.forEach((item, index) => {
@@ -785,7 +538,7 @@ function showShoppingSummary() {
                 <div class="summary-item clickable-item" onclick="showPurchasedItemDetail(${index})">
                     <span>${item.name}</span>
                     <span>${formatPrice(item.price)}</span>
-                    <span class="click-hint">👁️</span>
+                    <span class="click-hint">View</span>
                 </div>
             `;
         });
@@ -793,7 +546,6 @@ function showShoppingSummary() {
         purchasedList = '<div class="summary-item"><span>No items purchased</span><span>-</span></div>';
     }
     
-    // Create sold items list
     let soldList = '';
     if (soldItems.length > 0) {
         soldItems.forEach(item => {
@@ -808,7 +560,6 @@ function showShoppingSummary() {
         soldList = '<div class="summary-item"><span>No items sold</span><span>-</span></div>';
     }
     
-    // Calculate net change
     const startingTotal = convertToCopper(startingCurrency);
     const currentTotal = convertToCopper(playerCurrency);
     const netChange = currentTotal - startingTotal;
@@ -821,11 +572,11 @@ function showShoppingSummary() {
         <div class="modal-content">
             <span class="close" onclick="closeSummaryModal()">&times;</span>
             <div class="modal-header">
-                <h2 class="modal-title">📋 Shopping Summary</h2>
+                <h2 class="modal-title">Shopping Summary</h2>
             </div>
             
             <div class="summary-section">
-                <div class="summary-title">🛍️ Items Purchased</div>
+                <div class="summary-title">Items Purchased</div>
                 <div class="summary-list">
                     ${purchasedList}
                 </div>
@@ -833,7 +584,7 @@ function showShoppingSummary() {
             </div>
             
             <div class="summary-section">
-                <div class="summary-title">💰 Items Sold</div>
+                <div class="summary-title">Items Sold</div>
                 <div class="summary-list">
                     ${soldList}
                 </div>
@@ -841,16 +592,13 @@ function showShoppingSummary() {
             </div>
             
             <div class="summary-section">
-                <div class="summary-title">💼 Final Summary</div>
+                <div class="summary-title">Final Summary</div>
                 <div class="summary-item">
                     <span>Starting Currency:</span>
                     <span>${formatPrice(startingCurrency)}</span>
                 </div>
-                
-                <div class="summary-item">
-                <span>Current Currency:</span>
-                    <span><strong>${formatPrice(playerCurrency)}</strong></span>
-                    </div>
+               
+                <div class="summary-total">Current Currency: ${formatPrice(playerCurrency)}</div>
             </div>
             
             <button class="buy-btn" onclick="resetShopping()">New Shopping Session</button>
@@ -880,7 +628,6 @@ function showPurchasedItemDetail(itemIndex) {
     const purchasedItem = purchasedItems[itemIndex];
     if (!purchasedItem) return;
     
-    // Find the original item data from store
     let originalItem = null;
     for (let shopType in storeItems) {
         const found = storeItems[shopType].find(item => item.name === purchasedItem.name);
@@ -890,7 +637,6 @@ function showPurchasedItemDetail(itemIndex) {
         }
     }
     
-    // If we can't find the original item, create a basic one
     if (!originalItem) {
         originalItem = {
             name: purchasedItem.name,
@@ -902,25 +648,24 @@ function showPurchasedItemDetail(itemIndex) {
         };
     }
     
-    // Create detail modal
     const detailModal = document.createElement('div');
     detailModal.id = 'item-detail-modal';
     detailModal.className = 'modal';
     detailModal.style.display = 'block';
-    detailModal.style.zIndex = '2100'; // Higher than summary modal
+    detailModal.style.zIndex = '2100';
     
     detailModal.innerHTML = `
         <div class="modal-content">
             <span class="close" onclick="closeItemDetailModal()">&times;</span>
             <div class="modal-header">
                 <h2 class="modal-title">${originalItem.name}</h2>
-                <div class="modal-price">💰 ${formatPrice(originalItem.price)}</div>
+                <div class="modal-price">${formatPrice(originalItem.price)}</div>
                 <div class="item-rarity ${originalItem.rarity}">${originalItem.rarity.toUpperCase()}</div>
-                <div class="purchased-badge">✅ PURCHASED</div>
+                <div class="purchased-badge">PURCHASED</div>
             </div>
             <div class="modal-description">${originalItem.description}</div>
             <div class="stats-section">
-                <div class="stats-title">📊 Item Statistics</div>
+                <div class="stats-title">Item Statistics</div>
                 ${originalItem.stats}
             </div>
             <button class="buy-btn" onclick="closeItemDetailModal()" style="background: linear-gradient(145deg, #6b5c43, #8a7850);">
@@ -938,3 +683,106 @@ function closeItemDetailModal() {
         modal.remove();
     }
 }
+
+// Update currency display
+function updateCurrencyDisplay() {
+    document.getElementById('gold-amount').textContent = playerCurrency.gold;
+    document.getElementById('silver-amount').textContent = playerCurrency.silver;
+    document.getElementById('copper-amount').textContent = playerCurrency.copper;
+}
+
+// Currency setup functions
+function setupPlayerCurrency() {
+    const gold = parseInt(document.getElementById('input-gold').value) || 0;
+    const silver = parseInt(document.getElementById('input-silver').value) || 0;
+    const copper = parseInt(document.getElementById('input-copper').value) || 0;
+    
+    playerCurrency = { gold, silver, copper };
+    startingCurrency = { gold, silver, copper };
+    updateCurrencyDisplay();
+    
+    document.getElementById('currency-setup-modal').style.display = 'none';
+    initializeStore();
+}
+
+// Setup currency modal scroll indicators
+function setupCurrencyModal() {
+    const modal = document.getElementById('currency-setup-modal');
+    const modalContent = modal.querySelector('.modal-content');
+    
+    setTimeout(() => {
+        updateScrollIndicators(modalContent);
+        modalContent.addEventListener('scroll', () => updateScrollIndicators(modalContent));
+    }, 100);
+}
+
+// Show notification
+function showNotification(message, type) {
+    const notification = document.getElementById('notification');
+    notification.textContent = message;
+    notification.className = `notification ${type}`;
+    
+
+    setTimeout(() => {
+        notification.textContent = '';
+    }, 3000);
+}
+
+// Event listeners
+document.addEventListener('DOMContentLoaded', async function() {
+     // Load site configuration 
+    await loadSiteConfig();
+
+    // Load store configuration 
+    await loadStoreConfig();
+    
+    // Generate navigation buttons
+    generateNavigation();
+    
+    // Load items from Google Sheets
+    await loadStoreItems();
+    
+    // Initialize the first store
+    if (Object.keys(shopData).length > 0) {
+        const firstShop = Object.keys(shopData)[0];
+        switchShop(firstShop);
+    }
+    
+    // Setup currency first
+    document.getElementById('start-shopping').onclick = setupPlayerCurrency;
+    
+    // Setup currency modal scroll indicators
+    setupCurrencyModal();
+    
+    // Action button event listeners
+    document.getElementById('sell-btn').onclick = openSellModal;
+    document.getElementById('finish-shopping-btn').onclick = showShoppingSummary;
+    
+    // Other event listeners
+    document.querySelector('.close').onclick = closeModal;
+    document.getElementById('buy-button').onclick = purchaseItem;
+
+    window.onclick = function(event) {
+        const modal = document.getElementById('item-modal');
+        const setupModal = document.getElementById('currency-setup-modal');
+        if (event.target === modal) {
+            closeModal();
+        }
+    };
+
+    // Keyboard navigation
+    document.addEventListener('keydown', function(event) {
+        if (event.key === 'Escape') {
+            closeModal();
+        }
+    });
+    
+    // Allow Enter key in currency setup
+    document.querySelectorAll('.currency-input').forEach(input => {
+        input.addEventListener('keydown', function(event) {
+            if (event.key === 'Enter') {
+                setupPlayerCurrency();
+            }
+        });
+    });
+});
